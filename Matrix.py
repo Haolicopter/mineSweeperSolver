@@ -1,15 +1,33 @@
-#!/usr/bin/env python3
-
-import helpers
+from datetime import datetime
 
 
 class Matrix:
 
     def __init__(self, browser, height, width):
         self.browser = browser
+        self.driver = self.browser.driver
         self.height = height
         self.width = width
-        # Game starts with empty matrix
+        self.init()
+        self.cssToVal = {
+            'blank': None,
+            'open0': 0,
+            'open1': 1,
+            'open2': 2,
+            'open3': 3,
+            'open4': 4,
+            'open5': 5,
+            'open6': 6,
+            'open7': 7,
+            'open8': 8,
+            'bombflagged': -1,
+            'bombdeath': -999,
+            'bombrevealed': -999
+        }
+
+    # Game starts with empty matrix
+    def init(self):
+        self.error = None
         self.values = []
         for i in range(self.height):
             row = []
@@ -17,7 +35,99 @@ class Matrix:
                 row.append(None)
             self.values.append(row)
 
-    def print(self):
+    # Update the matrix
+    def update(self):
+        cells = self.driver.find_elements_by_class_name('square')
         for i in range(self.height):
             for j in range(self.width):
-                print(self.values[i][j])
+                cellClasses = cells[i*self.height+j].get_attribute('class')
+                self.values[i][j] = self.getValue(cellClasses)
+        # print('Matrix update completed')
+
+    # Parse cell css classes to get value
+    def getValue(self, cssclasses):
+        # Remove the first sqaure classp
+        cssClass = cssclasses.strip('square ')
+        val = self.cssToVal[cssClass]
+        if val is not None and val == -999:
+            self.error = 'Bomb'
+        return val
+
+    # Get surrounding neighbours (up to 8)
+    def getNeighbours(self, i, j):
+        imaginaryNeighbours = [
+            (i-1, j-1),
+            (i-1, j),
+            (i-1, j+1),
+            (i, j-1),
+            (i, j+1),
+            (i+1, j-1),
+            (i+1, j),
+            (i+1, j+1),
+        ]
+        neighbours = []
+        for (x, y) in imaginaryNeighbours:
+            if self.indexIsInRange(x, y):
+                neighbours.append((x, y))
+
+        return neighbours
+
+    # Check if index is in range
+    def indexIsInRange(self, row, col):
+        if row < 0 or row > self.height-1:
+            return False
+        if col < 0 or col > self.width-1:
+            return False
+        return True
+
+    # Scan through all cells
+    def scan(self):
+        self.updated = False
+        for i in range(self.height):
+            for j in range(self.width):
+                self.inspect(i, j)
+                if self.hasError():
+                    return False
+        return self.updated
+
+    def inspect(self, i, j):
+        val = self.values[i][j]
+        if val is not None and 1 <= val <= 8:
+            # Check neighbour cells (up to 8)
+            blanks = []
+            bombsFlaged = 0
+            for (x, y) in self.getNeighbours(i, j):
+                if self.values[x][y] is None:
+                    blanks.append((x, y))
+                elif self.values[x][y] == -1:
+                    bombsFlaged += 1
+            # No work to do
+            if len(blanks) == 0:
+                return True
+            cellId = str(i+1) + '_' + str(j+1)
+            if bombsFlaged == val:
+                print('All the bombs already found around ' + cellId)
+                print('Clicking on all blanks...')
+                for (x, y) in blanks:
+                    self.click(x, y)
+                    if self.hasError():
+                        return False
+            elif val == bombsFlaged + len(blanks):
+                print('Mark all blanks as bombs around' + cellId)
+                for (x, y) in blanks:
+                    self.flag(x, y)
+
+    # Click a cell to reavel value
+    def click(self, row, col):
+        self.browser.click(row, col)
+        self.update()
+        self.updated = True
+
+    # Flag a cell as bomb
+    def flag(self, row, col):
+        self.browser.flag(row, col)
+        self.values[row][col] = -1
+        self.updated = True
+
+    def hasError(self):
+        return self.error is not None
