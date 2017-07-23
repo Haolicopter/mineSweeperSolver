@@ -39,7 +39,6 @@ class Matrix:
             for j in range(self.width):
                 cellClasses = cells[i*self.height+j].get_attribute('class')
                 self.values[i][j] = self.getValue(cellClasses)
-        # print('Matrix update completed')
 
     # Parse cell css classes to get value
     def getValue(self, cssclasses):
@@ -87,32 +86,43 @@ class Matrix:
                     return False
         return self.updated
 
+    # See what we can do with this cell
     def inspect(self, i, j):
+        cellId = str(i+1) + '_' + str(j+1)
         val = self.values[i][j]
+        print('Inspecting cell ' + cellId)
         if val is not None and 1 <= val <= 8:
+            print('This cell has ' + str(val) + ' bombs around it')
             # Check neighbour cells (up to 8)
             blanks = []
-            bombsFlaged = 0
+            bombsFlagged = 0
             for (x, y) in self.getNeighbours(i, j):
                 if self.values[x][y] is None:
                     blanks.append((x, y))
                 elif self.values[x][y] == -1:
-                    bombsFlaged += 1
+                    bombsFlagged += 1
             # No work to do
             if len(blanks) == 0:
-                return True
-            cellId = str(i+1) + '_' + str(j+1)
-            if bombsFlaged == val:
+                print('But it has no blank neighbours')
+                return
+            if bombsFlagged == val:
                 print('All the bombs already found around ' + cellId)
                 print('Clicking on all blanks...')
                 for (x, y) in blanks:
                     self.click(x, y)
                     if self.hasError():
-                        return False
-            elif val == bombsFlaged + len(blanks):
-                print('Mark all blanks as bombs around' + cellId)
+                        return
+            elif val == bombsFlagged + len(blanks):
+                print('Mark all blanks as bombs around ' + cellId)
                 for (x, y) in blanks:
                     self.flag(x, y)
+            else:
+                print('Nothing to do with this cell, here\' some evidence:')
+                print('Val: ' + str(val))
+                print('BombsFlagged: ' + str(bombsFlagged))
+                print('No of blanks: ' + str(len(blanks)))
+        else:
+            print('This cell provides no value')
 
     # Click a cell to reavel value
     def click(self, row, col):

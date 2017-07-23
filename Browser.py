@@ -44,4 +44,4 @@ class Browser:
     def restartGame(self):
         cell = self.driver.find_element_by_id('face')
         ActionChains(self.driver).click(cell).perform()
-        print('Bad luck, restarting...')
+        print(os.linesep + 'Bad luck, restarting...' + os.linesep)
