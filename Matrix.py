@@ -1,6 +1,3 @@
-from datetime import datetime
-
-
 class Matrix:
 
     def __init__(self, browser, height, width):
