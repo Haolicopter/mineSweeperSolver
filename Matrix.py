@@ -37,16 +37,20 @@ class Matrix:
         cells = self.driver.find_elements_by_class_name('square')
         for i in range(self.height):
             for j in range(self.width):
-                cellClasses = cells[i*self.height+j].get_attribute('class')
+                cellClasses = cells[i*self.width+j].get_attribute('class')
+                # cellId = str(i+1) + '_' + str(j+1)
+                # print('Updating cell ' + cellId)
                 self.values[i][j] = self.getValue(cellClasses)
 
     # Parse cell css classes to get value
     def getValue(self, cssclasses):
+        # print('Translating css classes:' + cssclasses)
         # Remove the first sqaure classp
         cssClass = cssclasses.strip('square ')
         val = self.cssToVal[cssClass]
         if val is not None and val == -999:
             self.error = 'Bomb'
+        # print('To value: ' + str(val))
         return val
 
     # Get surrounding neighbours (up to 8)
@@ -90,7 +94,7 @@ class Matrix:
     def inspect(self, i, j):
         cellId = str(i+1) + '_' + str(j+1)
         val = self.values[i][j]
-        print('Inspecting cell ' + cellId)
+        print('Inspecting cell ' + cellId + ', with val of ' + str(val))
         if val is not None and 1 <= val <= 8:
             print('This cell has ' + str(val) + ' bombs around it')
             # Check neighbour cells (up to 8)
