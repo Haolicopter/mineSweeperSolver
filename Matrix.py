@@ -31,6 +31,7 @@ class Matrix:
             for j in range(self.width):
                 row.append(None)
             self.values.append(row)
+        self.cellsNeedScan = []
 
     # Update the matrix
     def update(self):
@@ -38,9 +39,12 @@ class Matrix:
         for i in range(self.height):
             for j in range(self.width):
                 cellClasses = cells[i*self.width+j].get_attribute('class')
-                # cellId = str(i+1) + '_' + str(j+1)
-                # print('Updating cell ' + cellId)
-                self.values[i][j] = self.getValue(cellClasses)
+                newVal = self.getValue(cellClasses)
+                if self.hasError():
+                    return False
+                if self.values[i][j] != newVal:
+                    self.values[i][j] = newVal
+                    self.cellsNeedScan.append((i, j))
 
     # Parse cell css classes to get value
     def getValue(self, cssclasses):
@@ -82,13 +86,11 @@ class Matrix:
 
     # Scan through all cells
     def scan(self):
-        self.updated = False
-        for i in range(self.height):
-            for j in range(self.width):
-                self.inspect(i, j)
-                if self.hasError():
-                    return False
-        return self.updated
+        for (i, j) in self.cellsNeedScan:
+            self.inspect(i, j)
+            self.cellsNeedScan.remove((i, j))
+            if self.hasError():
+                return False
 
     # See what we can do with this cell
     def inspect(self, i, j):
@@ -133,13 +135,11 @@ class Matrix:
     # Click a cell to reavel value
     def click(self, row, col):
         self.browser.click(row, col)
-        self.updated = True
 
     # Flag a cell as bomb
     def flag(self, row, col):
         self.browser.flag(row, col)
         self.values[row][col] = -1
-        self.updated = True
 
     def hasError(self):
         return self.error is not None

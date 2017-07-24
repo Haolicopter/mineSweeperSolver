@@ -27,7 +27,6 @@ class Puzzle:
         self.loadSettings()
         # Load matrix from game
         self.matrix = Matrix(self.browser, self.height, self.width)
-        self.uselessScanCount = 0
 
     # Load game settings like difficulty, height, width, and mines
     def loadSettings(self):
@@ -53,26 +52,17 @@ class Puzzle:
         self.randomClick()
 
         while True:
-            updated = self.matrix.scan()
-            if self.matrix.hasError():
+            self.matrix.scan()
+            if self.matrix.hasError() or self.status() == 'facedead':
                 print('Error!')
                 self.restart()
                 continue
 
-            if updated:
-                print('Useful scan, woohoo!')
-                self.uselessScanCount = 0
-            else:
-                print('This scan did nothing :(')
-                self.uselessScanCount += 1
-
-            if self.uselessScanCount > 2:
+            if len(self.matrix.cellsNeedScan) == 0:
                 print('Scans not effective, firing the secret weapon...')
                 self.randomClick()
 
-            if self.status() == 'facedead':
-                self.restart()
-            elif self.status() == 'facewin':
+            if self.status() == 'facewin':
                 print('We did it!')
                 return
 
