@@ -91,6 +91,7 @@ class Puzzle:
             if self.status() == 'facedead':
                 self.restart()
             else:
+                self.matrix.update()
                 self.uselessScanCount = 0
                 break
 

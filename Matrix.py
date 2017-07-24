@@ -125,13 +125,14 @@ class Matrix:
                 print('Val: ' + str(val))
                 print('BombsFlagged: ' + str(bombsFlagged))
                 print('No of blanks: ' + str(len(blanks)))
+            # Update all at once
+            self.update()
         else:
             print('This cell provides no value')
 
     # Click a cell to reavel value
     def click(self, row, col):
         self.browser.click(row, col)
-        self.update()
         self.updated = True
 
     # Flag a cell as bomb
