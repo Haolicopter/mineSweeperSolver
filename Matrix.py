@@ -44,7 +44,9 @@ class Matrix:
                     return False
                 if self.values[i][j] != newVal:
                     self.values[i][j] = newVal
-                    self.cellsNeedScan.append((i, j))
+                    # Only scan valuable cell
+                    if self.isValuable(newVal):
+                        self.cellsNeedScan.append((i, j))
 
     # Parse cell css classes to get value
     def getValue(self, cssclasses):
@@ -56,6 +58,10 @@ class Matrix:
             self.error = 'Bomb'
         # print('To value: ' + str(val))
         return val
+
+    # Check if a cell is worth scaning
+    def isValuable(self, val):
+        return val is not None and 1 <= val <= 8
 
     # Get surrounding neighbours (up to 8)
     def getNeighbours(self, i, j):
@@ -99,7 +105,7 @@ class Matrix:
         val = self.values[i][j]
         print('Inspecting cell ' + cellId + ', with val of ' + str(val))
         needFurtherInspection = True
-        if val is not None and 1 <= val <= 8:
+        if self.isValuable(val):
             print('This cell has ' + str(val) + ' bombs around it')
             # Check neighbour cells (up to 8)
             blanks = []
