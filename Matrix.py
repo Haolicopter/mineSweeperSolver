@@ -93,8 +93,8 @@ class Matrix:
     # Scan through all cells
     def scan(self):
         for (i, j) in self.cellsNeedScan:
-            needFurtherInspection = self.inspect(i, j)
-            if not needFurtherInspection:
+            furtherInspection = self.inspect(i, j)
+            if not furtherInspection:
                 self.cellsNeedScan.remove((i, j))
             if self.hasError():
                 return False
@@ -104,7 +104,7 @@ class Matrix:
         cellId = str(i+1) + '_' + str(j+1)
         val = self.values[i][j]
         print('Inspecting cell ' + cellId + ', with val of ' + str(val))
-        needFurtherInspection = True
+        furtherInspection = True
         if self.isValuable(val):
             print('This cell has ' + str(val) + ' bombs around it')
             # Check neighbour cells (up to 8)
@@ -118,29 +118,29 @@ class Matrix:
             # No work to do
             if len(blanks) == 0:
                 print('But it has no blank neighbours')
-                needFurtherInspection = False
-                return needFurtherInspection
+                furtherInspection = False
+                return furtherInspection
             if bombsFlagged == val:
                 print('All the bombs already found around ' + cellId)
                 print('Clicking on all blanks...')
-                needFurtherInspection = False
+                furtherInspection = False
                 for (x, y) in blanks:
                     self.click(x, y)
                     if self.hasError():
-                        needFurtherInspection = False
-                        return needFurtherInspection
+                        furtherInspection = False
+                        return furtherInspection
             elif val == bombsFlagged + len(blanks):
                 print('Mark all blanks as bombs around ' + cellId)
-                needFurtherInspection = False
+                furtherInspection = False
                 for (x, y) in blanks:
                     self.flag(x, y)
             # Update all at once
             self.update()
         else:
             print('This cell provides no value')
-            needFurtherInspection = True
+            furtherInspection = True
 
-        return needFurtherInspection
+        return furtherInspection
 
     # Click a cell to reavel value
     def click(self, row, col):
