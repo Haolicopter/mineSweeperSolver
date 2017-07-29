@@ -92,12 +92,21 @@ class Matrix:
 
     # Scan through all cells
     def scan(self):
+        startCount = len(self.cellsNeedScan)
+        furtherInspectionCount = 0
         for (i, j) in self.cellsNeedScan:
             furtherInspection = self.inspect(i, j)
             if not furtherInspection:
                 self.cellsNeedScan.remove((i, j))
+            else:
+                furtherInspectionCount += 1
             if self.hasError():
                 return False
+
+        if startCount == furtherInspectionCount:
+            self.scanNotEffective = True
+        else:
+            self.scanNotEffective = False
 
     # See what we can do with this cell
     def inspect(self, i, j):
