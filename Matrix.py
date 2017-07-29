@@ -31,7 +31,7 @@ class Matrix:
             for j in range(self.width):
                 row.append(None)
             self.values.append(row)
-        self.cellsNeedScan = []
+        self.cellsToScan = []
 
     # Update the matrix
     def update(self):
@@ -46,7 +46,7 @@ class Matrix:
                     self.values[i][j] = newVal
                     # Only scan valuable cell
                     if self.isValuable(newVal):
-                        self.cellsNeedScan.append((i, j))
+                        self.cellsToScan.append((i, j))
 
     # Parse cell css classes to get value
     def getValue(self, cssclasses):
@@ -92,12 +92,12 @@ class Matrix:
 
     # Scan through all cells
     def scan(self):
-        startCount = len(self.cellsNeedScan)
+        startCount = len(self.cellsToScan)
         furtherInspectionCount = 0
-        for (i, j) in self.cellsNeedScan:
+        for (i, j) in self.cellsToScan:
             furtherInspection = self.inspect(i, j)
             if not furtherInspection:
-                self.cellsNeedScan.remove((i, j))
+                self.cellsToScan.remove((i, j))
             else:
                 furtherInspectionCount += 1
             if self.hasError():

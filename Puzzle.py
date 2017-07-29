@@ -59,7 +59,7 @@ class Puzzle:
                 continue
 
             if (self.matrix.scanNotEffective or
-                    len(self.matrix.cellsNeedScan) == 0):
+                    len(self.matrix.cellsToScan) == 0):
                 print('Scans not effective, firing the secret weapon...')
                 self.randomClick()
 
