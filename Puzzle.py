@@ -57,15 +57,14 @@ class Puzzle:
                 print('Error!')
                 self.restart()
                 continue
+            elif self.status() == 'facewin':
+                print('We did it!')
+                return
 
             if (self.matrix.scanNotEffective or
                     len(self.matrix.cellsToScan) == 0):
                 print('Scans not effective, firing secret weapon...')
                 self.randomClick()
-
-            if self.status() == 'facewin':
-                print('We did it!')
-                return
 
     # Take a random guess that does not end the game
     def randomClick(self):
