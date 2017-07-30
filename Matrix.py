@@ -36,6 +36,7 @@ class Matrix:
     # Update the matrix
     def update(self):
         cells = self.driver.find_elements_by_class_name('square')
+        cellsWithValues = []
         for i in range(self.height):
             for j in range(self.width):
                 cellClasses = cells[i*self.width+j].get_attribute('class')
@@ -44,9 +45,11 @@ class Matrix:
                     return False
                 if self.values[i][j] != newVal:
                     self.values[i][j] = newVal
-                    # Only scan valuable cell
-                    if self.isValuable(newVal):
-                        self.cellsToScan.append((i, j))
+                if self.isValuable(self.values[i][j]):
+                    cellsWithValues.append((i, j))
+
+        for (i, j) in cellsWithValues:
+            self.updateScanList(i, j)
 
     # Parse cell css classes to get value
     def getValue(self, cssclasses):
@@ -58,6 +61,24 @@ class Matrix:
             self.error = 'Bomb'
         # print('To value: ' + str(val))
         return val
+
+    # Check if a cell needs scan
+    def updateScanList(self, i, j):
+        val = self.values[i][j]
+        blanks = []
+        bombsFlagged = 0
+        for (x, y) in self.getNeighbours(i, j):
+            if self.values[x][y] is None:
+                blanks.append((x, y))
+            elif self.values[x][y] == -1:
+                bombsFlagged += 1
+        if len(blanks) == 0:
+            return
+        if ((bombsFlagged == val or val == bombsFlagged + len(blanks)) and
+                (i, j, blanks, bombsFlagged) not in self.cellsToScan):
+            self.cellsToScan.append((i, j, blanks, bombsFlagged))
+            cellId = str(i+1) + '_' + str(j+1)
+            print('Adding cell ' + cellId + ' to the scan list')
 
     # Check if a cell is worth scaning
     def isValuable(self, val):
@@ -92,12 +113,15 @@ class Matrix:
 
     # Scan through all cells
     def scan(self):
+        print('Start new round of scan...')
         startCount = len(self.cellsToScan)
         furtherInspectionCount = 0
-        for (i, j) in self.cellsToScan:
-            furtherInspection = self.inspect(i, j)
+        for (i, j, blanks, bombsFlagged) in self.cellsToScan:
+            furtherInspection = self.inspect(i, j, blanks, bombsFlagged)
             if not furtherInspection:
-                self.cellsToScan.remove((i, j))
+                self.cellsToScan.remove((i, j, blanks, bombsFlagged))
+                cellId = str(i+1) + '_' + str(j+1)
+                print('Removing cell ' + cellId + ' from the scan list')
             else:
                 furtherInspectionCount += 1
             if self.hasError():
@@ -109,21 +133,15 @@ class Matrix:
             self.scanNotEffective = False
 
     # See what we can do with this cell
-    def inspect(self, i, j):
+    def inspect(self, i, j, blanks, bombsFlagged):
         cellId = str(i+1) + '_' + str(j+1)
         val = self.values[i][j]
-        print('Inspecting cell ' + cellId + ', with val of ' + str(val))
+        print('\nInspecting cell ' + cellId + ', with val of ' + str(val))
         furtherInspection = True
         if self.isValuable(val):
-            print('This cell has ' + str(val) + ' bombs around it')
-            # Check neighbour cells (up to 8)
-            blanks = []
-            bombsFlagged = 0
-            for (x, y) in self.getNeighbours(i, j):
-                if self.values[x][y] is None:
-                    blanks.append((x, y))
-                elif self.values[x][y] == -1:
-                    bombsFlagged += 1
+            print('#Bomb: ' + str(val))
+            print('#BombFlag: ' + str(bombsFlagged))
+            print('#Blanks: ' + str(len(blanks)))
             # No work to do
             if len(blanks) == 0:
                 print('But it has no blank neighbours')
