@@ -153,10 +153,14 @@ class Matrix:
 
     # Click a cell to reavel value
     def click(self, row, col):
+        if self.values[row][col] is not None:
+            return
         self.browser.click(row, col)
 
     # Flag a cell as bomb
     def flag(self, row, col):
+        if self.values[row][col] == -1:
+            return
         self.browser.flag(row, col)
         self.values[row][col] = -1
 
