@@ -135,10 +135,6 @@ class Matrix:
             print('#Bomb: ' + str(val))
             print('#BombFlag: ' + str(bombsFlagged))
             print('#Blanks: ' + str(len(blanks)))
-            # No work to do
-            if len(blanks) == 0:
-                print('But it has no blank neighbours')
-                return
             if bombsFlagged == val:
                 print('All the bombs already found around ' + cellId)
                 print('Clicking on all blanks...')
