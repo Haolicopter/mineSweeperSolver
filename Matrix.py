@@ -120,31 +120,21 @@ class Matrix:
     # Scan through all cells
     def scan(self):
         print('Start new round of scan...')
-        startCount = len(self.cellsToScan)
-        furtherInspectionCount = 0
         while len(self.cellsToScan) > 0:
+            # Use pop to replace get and remove
             (i, j, blanks, bombsFlagged) = self.cellsToScan[0]
-            furtherInspection = self.inspect(i, j, blanks, bombsFlagged)
-            if not furtherInspection:
-                self.cellsToScan.remove((i, j, blanks, bombsFlagged))
-                cellId = str(i+1) + '_' + str(j+1)
-                print('Removing cell ' + cellId + ' from the scan list')
-            else:
-                furtherInspectionCount += 1
+            self.inspect(i, j, blanks, bombsFlagged)
+            self.cellsToScan.remove((i, j, blanks, bombsFlagged))
+            cellId = str(i+1) + '_' + str(j+1)
+            print('Removing cell ' + cellId + ' from the scan list')
             if self.hasError():
                 return False
-
-        if startCount == furtherInspectionCount:
-            self.scanNotEffective = True
-        else:
-            self.scanNotEffective = False
 
     # See what we can do with this cell
     def inspect(self, i, j, blanks, bombsFlagged):
         cellId = str(i+1) + '_' + str(j+1)
         val = self.values[i][j]
         print('\nInspecting cell ' + cellId + ', with val of ' + str(val))
-        furtherInspection = True
         if self.isValuable(val):
             print('#Bomb: ' + str(val))
             print('#BombFlag: ' + str(bombsFlagged))
@@ -152,29 +142,22 @@ class Matrix:
             # No work to do
             if len(blanks) == 0:
                 print('But it has no blank neighbours')
-                furtherInspection = False
-                return furtherInspection
+                return
             if bombsFlagged == val:
                 print('All the bombs already found around ' + cellId)
                 print('Clicking on all blanks...')
-                furtherInspection = False
                 for (x, y) in blanks:
                     self.reveal(x, y)
                     if self.hasError():
-                        furtherInspection = False
-                        return furtherInspection
+                        return
             elif val == bombsFlagged + len(blanks):
                 print('Mark all blanks as bombs around ' + cellId)
-                furtherInspection = False
                 for (x, y) in blanks:
                     self.flag(x, y)
             # Update all at once
             self.update()
         else:
             print('This cell provides no value')
-            furtherInspection = True
-
-        return furtherInspection
 
     # Click a cell to reveal value
     def reveal(self, row, col):
