@@ -29,7 +29,7 @@ class Browser:
             return False
         return True
 
-    def click(self, row, col):
+    def reveal(self, row, col):
         cellCssId = str(row+1) + '_' + str(col+1)
         cell = self.driver.find_element_by_id(cellCssId)
         ActionChains(self.driver).click(cell).perform()

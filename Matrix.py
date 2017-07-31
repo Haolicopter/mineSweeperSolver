@@ -152,7 +152,7 @@ class Matrix:
                 print('Clicking on all blanks...')
                 furtherInspection = False
                 for (x, y) in blanks:
-                    self.click(x, y)
+                    self.reveal(x, y)
                     if self.hasError():
                         furtherInspection = False
                         return furtherInspection
@@ -169,11 +169,11 @@ class Matrix:
 
         return furtherInspection
 
-    # Click a cell to reavel value
-    def click(self, row, col):
+    # Click a cell to reveal value
+    def reveal(self, row, col):
         if self.values[row][col] is not None:
             return
-        self.browser.click(row, col)
+        self.browser.reveal(row, col)
 
     # Flag a cell as bomb
     def flag(self, row, col):

@@ -82,7 +82,7 @@ class Puzzle:
                     break
 
             print('Taking a random guess...')
-            self.matrix.click(randomRow, randomCol)
+            self.matrix.reveal(randomRow, randomCol)
             if self.status() == 'facedead':
                 self.restart()
             else:
