@@ -72,13 +72,19 @@ class Matrix:
                 blanks.append((x, y))
             elif self.values[x][y] == -1:
                 bombsFlagged += 1
+        cellId = str(i+1) + '_' + str(j+1)
         if len(blanks) == 0:
+            if (i, j, blanks, bombsFlagged) in self.cellsToScan:
+                self.cellsToScan.remove((i, j, blanks, bombsFlagged))
+                print('Removing cell ' + cellId + ' from the scan list')
             return
         if ((bombsFlagged == val or val == bombsFlagged + len(blanks)) and
                 (i, j, blanks, bombsFlagged) not in self.cellsToScan):
             self.cellsToScan.append((i, j, blanks, bombsFlagged))
-            cellId = str(i+1) + '_' + str(j+1)
             print('Adding cell ' + cellId + ' to the scan list')
+        elif (i, j, blanks, bombsFlagged) in self.cellsToScan:
+            self.cellsToScan.remove((i, j, blanks, bombsFlagged))
+            print('Removing cell ' + cellId + ' from the scan list')
 
     # Check if a cell is worth scaning
     def isValuable(self, val):
@@ -116,7 +122,8 @@ class Matrix:
         print('Start new round of scan...')
         startCount = len(self.cellsToScan)
         furtherInspectionCount = 0
-        for (i, j, blanks, bombsFlagged) in self.cellsToScan:
+        while len(self.cellsToScan) > 0:
+            (i, j, blanks, bombsFlagged) = self.cellsToScan[0]
             furtherInspection = self.inspect(i, j, blanks, bombsFlagged)
             if not furtherInspection:
                 self.cellsToScan.remove((i, j, blanks, bombsFlagged))
