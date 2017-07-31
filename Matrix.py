@@ -78,10 +78,10 @@ class Matrix:
                 self.cellsToScan.remove((i, j, blanks, bombsFlagged))
                 print('Removing cell ' + cellId + ' from the scan list')
             return
-        if ((bombsFlagged == val or val == bombsFlagged + len(blanks)) and
-                (i, j, blanks, bombsFlagged) not in self.cellsToScan):
-            self.cellsToScan.append((i, j, blanks, bombsFlagged))
-            print('Adding cell ' + cellId + ' to the scan list')
+        if bombsFlagged == val or val == bombsFlagged + len(blanks):
+            if (i, j, blanks, bombsFlagged) not in self.cellsToScan:
+                self.cellsToScan.append((i, j, blanks, bombsFlagged))
+                print('Adding cell ' + cellId + ' to the scan list')
         elif (i, j, blanks, bombsFlagged) in self.cellsToScan:
             self.cellsToScan.remove((i, j, blanks, bombsFlagged))
             print('Removing cell ' + cellId + ' from the scan list')
