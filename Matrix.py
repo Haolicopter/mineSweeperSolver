@@ -148,8 +148,6 @@ class Matrix:
                     self.flag(x, y)
             # Update all at once
             self.update()
-        else:
-            print('This cell provides no value')
 
     # Click a cell to reveal value
     def reveal(self, row, col):
