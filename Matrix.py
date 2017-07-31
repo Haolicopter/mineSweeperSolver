@@ -31,7 +31,7 @@ class Matrix:
             for j in range(self.width):
                 row.append(None)
             self.values.append(row)
-        self.cellsToScan = []
+        self.cellsToScan = {}
 
     # Update the matrix
     def update(self):
@@ -53,13 +53,11 @@ class Matrix:
 
     # Parse cell css classes to get value
     def getValue(self, cssclasses):
-        # print('Translating css classes:' + cssclasses)
-        # Remove the first sqaure classp
+        # Remove the first sqaure class
         cssClass = cssclasses.strip('square ')
         val = self.cssToVal[cssClass]
         if val is not None and val == -999:
             self.error = 'Bomb'
-        # print('To value: ' + str(val))
         return val
 
     # Check if a cell needs scan
@@ -74,16 +72,16 @@ class Matrix:
                 bombsFlagged += 1
         cellId = str(i+1) + '_' + str(j+1)
         if len(blanks) == 0:
-            if (i, j, blanks, bombsFlagged) in self.cellsToScan:
-                self.cellsToScan.remove((i, j, blanks, bombsFlagged))
+            if (i, j) in self.cellsToScan:
+                del self.cellsToScan[(i, j)]
                 print('Removing cell ' + cellId + ' from the scan list')
             return
         if bombsFlagged == val or val == bombsFlagged + len(blanks):
-            if (i, j, blanks, bombsFlagged) not in self.cellsToScan:
-                self.cellsToScan.append((i, j, blanks, bombsFlagged))
+            if (i, j) not in self.cellsToScan:
+                self.cellsToScan[(i, j)] = (blanks, bombsFlagged)
                 print('Adding cell ' + cellId + ' to the scan list')
-        elif (i, j, blanks, bombsFlagged) in self.cellsToScan:
-            self.cellsToScan.remove((i, j, blanks, bombsFlagged))
+        elif (i, j) in self.cellsToScan:
+            del self.cellsToScan[(i, j)]
             print('Removing cell ' + cellId + ' from the scan list')
 
     # Check if a cell is worth scaning
@@ -121,12 +119,10 @@ class Matrix:
     def scan(self):
         print('Start new round of scan...')
         while len(self.cellsToScan) > 0:
-            # Use pop to replace get and remove
-            (i, j, blanks, bombsFlagged) = self.cellsToScan[0]
+            (i, j), (blanks, bombsFlagged) = self.cellsToScan.popitem()
             self.inspect(i, j, blanks, bombsFlagged)
-            self.cellsToScan.remove((i, j, blanks, bombsFlagged))
             cellId = str(i+1) + '_' + str(j+1)
-            print('Removing cell ' + cellId + ' from the scan list')
+            print('Popping cell ' + cellId + ' from the scan list')
             if self.hasError():
                 return False
 

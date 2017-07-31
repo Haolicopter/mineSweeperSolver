@@ -1,7 +1,6 @@
 from Browser import Browser
 from Matrix import Matrix
 import random
-import sys
 
 
 class Puzzle:
@@ -69,8 +68,6 @@ class Puzzle:
 
             if len(self.matrix.cellsToScan) == 0:
                 print('Scans not effective, firing secret weapon...')
-                # TODO: remove secret weapon debugging
-                # sys.exit(1)
                 self.randomClick()
 
     # Take a random guess that does not end the game
