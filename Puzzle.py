@@ -4,12 +4,12 @@ import random
 
 
 class Puzzle:
-    DIFFICULTY = [
-        'beginner',
-        'intermediate',
-        'expert',
-        'custom'
-    ]
+    DIFFICULTY = {
+        'beginner': 'beginner',
+        'intermediate': 'intermediate',
+        'expert': '',
+        'custom': ''
+    }
     FACES = [
         'facesmile',
         'faceooh',
@@ -18,11 +18,12 @@ class Puzzle:
     ]
 
     def __init__(self):
-        # Get Selenium Chrome Driver
         self.browser = Browser()
         self.driver = self.browser.driver
-        # Load game into browser
-        self.driver.get('http://minesweeperonline.com/')
+        self.url = 'http://minesweeperonline.com/'
+
+    def loadGame(self):
+        self.driver.get(self.url)
         # Load game setting
         self.loadSettings()
         # Load matrix from game
@@ -46,8 +47,12 @@ class Puzzle:
                 print('Width: ' + str(self.width))
                 print('Mines: ' + str(self.mines))
 
+    def set(self, difficulty):
+        self.url += '#' + Puzzle.DIFFICULTY[difficulty]
+
     # Let's play!
     def play(self):
+        self.loadGame()
         # First take a random guess
         self.randomClick()
 
